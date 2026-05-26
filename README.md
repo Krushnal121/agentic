@@ -53,46 +53,97 @@ Works with your existing workflow:
 + *Automatically detects .py file and loads Python expertise*
 ```
 
-## Quick Start
+## Getting Started
 
-### 1. Install Skills
+### Step 1: Install Skills
 ```bash
-# Install all skills
 npx skills add Krushnal121/agentic
-
-# Or install globally with IDE adapter
-npx skills add Krushnal121/agentic -g -a claude-code
 ```
 
-### 2. Setup IDE Integration
+**Select all 3 skills when prompted:**
+```
+◆  Select skills to install (space to toggle)
+│  ☑ go (Enterprise Go 1.26.x patterns - 10,738+ lines)
+│  ☑ setup (IDE rule generation)  
+│  ☑ project-rules (Infrastructure templates)
+```
+
+**Why all 3?**
+- **go**: Your comprehensive enterprise Go skill (the actual valuable content)
+- **setup**: Auto-generates IDE rules so skills load automatically
+- **project-rules**: Infrastructure that setup needs for template processing
+
+### Step 2: Configure Your Project
 ```bash
-# In your project, tell your agent:
-"Run the setup skill"
+# Navigate to your Go project
+cd /path/to/your/go-project
+
+# Tell your AI assistant:
+"Run the setup skill to configure IDE rules for the installed skills"
 ```
 
-This auto-detects your IDE and generates the right config files:
-- Cursor → `.cursor/rules/` with conditional loading
-- Claude Code → `CLAUDE.md` with smart routing  
-- Windsurf → `.windsurf/rules/skills.md`
-- GitHub Copilot → `.github/copilot-instructions.md`
+**What setup does automatically:**
+1. **Detects your IDE** (.cursor/, .claude/, .github/ directories)
+2. **Finds installed skills** (go 1.26, python, etc.)
+3. **Generates IDE rules** (.cursor/rules/agentic-go-1.26.mdc, etc.)
+4. **Configures auto-loading** (skills activate based on file types)
 
-### 3. Code Like Magic
+### Step 3: Code with Expert Guidance
+
+**The magic happens automatically:**
 ```bash
-# Open any .go file
-# Agent automatically knows Go best practices
-
-# Switch to .py file  
-# Agent instantly becomes Python expert
-
-# Edit .ts file
-# TypeScript mastery activated
+# Open main.go → Go 1.26 enterprise patterns load instantly
+# Work with testing → Mockery integration, t.Parallel() patterns  
+# Handle errors → Proper wrapping, context, sentinel errors
+# Write APIs → Function options, builder patterns, resource management
+# Security concerns → Input validation, crypto best practices
 ```
 
-### 4. Share with Your Team
+**Available expertise:**
+- **15 comprehensive modules** covering all Go aspects
+- **10,738+ lines** of enterprise-focused guidance
+- **Modern tooling** (mockery, testcontainers, golangci-lint)
+- **Production patterns** for senior developers
+
+### Step 4: Share with Your Team
 ```bash
-# Commit the generated IDE configuration files
-# Team members automatically get the same intelligent behavior
+# Commit the generated IDE files to version control
+git add .cursor/rules/ .claude/rules/ CLAUDE.md
+git commit -m "Add agentic skills configuration"
+
+# Team members get the same intelligent AI behavior automatically
 ```
+
+### 🔧 Troubleshooting
+
+**Skills not loading?**
+1. Verify setup ran successfully: check for `.cursor/rules/` or `.claude/rules/` files
+2. Ensure you selected all 3 skills during installation (go, setup, project-rules)
+3. Try running setup skill again if IDE rules are missing
+4. Check that you're working with `.go` files (skills are file-type triggered)
+
+## What You Get
+
+### 🎯 **Go 1.26 Enterprise Skill**
+- **15 Comprehensive Modules**: Testing, security, performance, concurrency, architecture
+- **10,738+ Lines** of expert guidance written for senior developers
+- **Modern Tooling**: Integration with mockery, testcontainers, golangci-lint
+- **Production Ready**: Enterprise patterns, security practices, deployment strategies
+
+### 📚 **Complete Coverage**
+1. **Style Guide** - Uber Go Guide implementation + documentation standards
+2. **Testing Strategies** - Mockery integration, parallel testing, benchmarking
+3. **Security Practices** - Input validation, cryptography, authentication
+4. **Performance** - Profiling, optimization, memory management
+5. **Concurrency** - Goroutines, channels, worker pools, circuit breakers
+6. **Enterprise Architecture** - Project layout, logging, monitoring, deployment
+7. **Anti-patterns** - Common pitfalls and how to avoid them
+
+### 🚀 **Zero-Friction Experience**
+- **No manual invocation** - Skills activate automatically based on file context
+- **Context-aware** - Only relevant skills load, keeping AI responses focused
+- **Team consistency** - Everyone gets the same expert guidance
+- **Version control** - Choose exact skill versions for your project needs
 
 ## Advanced Features
 
