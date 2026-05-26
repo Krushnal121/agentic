@@ -20,24 +20,24 @@ File uploads not yet in context → load skills/file-reading/SKILL.md if availab
 
 The setup skill scans for installed skills and creates individual `.mdc` files only for detected skills:
 
-### If skills/go/SKILL.md exists → Create `.cursor/rules/agentic-go.mdc`:
+### If skills/go/*/SKILL.md exists → Create `.cursor/rules/agentic-go-<version>.mdc`:
 ```yaml
 ---
-description: Go skill routing
+description: Go skill routing (version <version>)
 globs: ["**/*.go", "**/go.mod", "**/go.sum"]
 alwaysApply: false
 ---
-Read skills/go/SKILL.md before writing or editing Go code.
+Read skills/go/<version>/SKILL.md before writing or editing Go code.
 ```
 
-### If skills/python/SKILL.md exists → Create `.cursor/rules/agentic-python.mdc`:
+### If skills/python/*/SKILL.md exists → Create `.cursor/rules/agentic-python-<version>.mdc`:
 ```yaml
 ---
-description: Python skill routing  
+description: Python skill routing (version <version>)
 globs: ["**/*.py"]
 alwaysApply: false
 ---
-Read skills/python/SKILL.md before writing or editing Python code.
+Read skills/python/<version>/SKILL.md before writing or editing Python code.
 ```
 
 ### If skills/typescript/SKILL.md exists → Create `.cursor/rules/agentic-typescript.mdc`:
@@ -112,28 +112,26 @@ File type skill loading (only for installed skills):
 
 ## How Setup Works with Branch-Based Installation
 
-1. **Scan for skills**: Check what skills/ directories exist (any type: languages, frameworks, auth, etc.)
+1. **Scan for skills**: Check what skills/<name>/<version>/ directories exist
 2. **Create base rules**: Always create universal rules
-3. **Add skill-specific rules**: Only for detected skills (supports mix of branches and skill types)
-4. **Additive approach**: Mix and match any skills from any branches
-5. **No conflicts**: Each skill gets its own .mdc file with unique naming (agentic-{skill}.mdc)
+3. **Add skill-specific rules**: Only for detected skills with version information
+4. **Additive approach**: Mix and match any skills and versions
+5. **No conflicts**: Each skill gets its own .mdc file with unique naming (agentic-{skill}-{version}.mdc)
 
 **Examples of supported skill combinations:**
 ```bash
-# Language skills from specific versions
-npx skills add https://github.com/Krushnal121/agentic/tree/go/1.23/skills/go
+# Install skills with version selection
+npx skills add Krushnal121/agentic
+# Shows picker with versions: go 1.26, python 3.12, etc.
 
-# Framework skills from versioned branches  
-npx skills add https://github.com/Krushnal121/agentic/tree/react/18.2/skills/react
-
-# Auth-specific skills
-npx skills add https://github.com/Krushnal121/agentic/tree/auth/saml/skills/auth
+# Specific version installations still supported
+npx skills add https://github.com/Krushnal121/agentic/tree/go/1.25/skills/go/1.25
 
 # Mix and match - all work together!
 ```
 
 **Result:** Each gets its own configuration:
-- `.cursor/rules/agentic-go.mdc` (Go 1.23 patterns)
-- `.cursor/rules/agentic-react.mdc` (React 18.2 patterns) 
-- `.cursor/rules/agentic-auth.mdc` (SAML auth patterns)
+- `.cursor/rules/agentic-go-1.26.mdc` (Go 1.26 enterprise patterns)
+- `.cursor/rules/agentic-python-3.12.mdc` (Python 3.12 patterns) 
+- `.cursor/rules/agentic-react-18.mdc` (React 18 patterns)
 - Universal rules stay consistent across all installations

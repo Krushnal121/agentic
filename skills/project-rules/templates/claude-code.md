@@ -20,17 +20,17 @@ When working with these file types, the corresponding skill loads automatically 
 
 ## Language-Specific Rules
 
-Language skills are stored in separate `.claude/rules/agentic-<lang>.md` files to avoid bloating this root file. The setup skill creates these files only for installed skills.
+Language skills are stored in separate `.claude/rules/agentic-<lang>-<version>.md` files to avoid bloating this root file. The setup skill creates these files only for installed skills with their specific versions.
 
-**Installed Skills** (setup detects these automatically):
+**Installed Skills with Versions** (setup detects these automatically):
 {SKILL_LIST}
 
-## Branch-Compatible Installation
+## Versioned Skill Installation
 
-This configuration supports mixed skill installation:
-- Install Go 1.23 from `go/1.23` branch: Gets `.claude/rules/agentic-go.md`
-- Later install Python from main branch: Gets `.claude/rules/agentic-python.md`
-- Both skills work independently without conflicts
+This configuration supports mixed skill and version installation:
+- Install Go 1.26: Gets `.claude/rules/agentic-go-1.26.md`
+- Install Python 3.12: Gets `.claude/rules/agentic-python-3.12.md`
+- All skills and versions work independently without conflicts
 
 ## How It Works
 

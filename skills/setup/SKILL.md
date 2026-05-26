@@ -72,9 +72,11 @@ When this skill is invoked:
 
 1. **Scan for installed skills:**
    ```
-   - Check which skills/ directories exist (any type: go, python, react, auth, docker, etc.)
-   - Verify each has a valid SKILL.md file
-   - Build list of available skills for template rendering
+   - Check for versioned skills: skills/<name>/<version>/SKILL.md (e.g., skills/go/1.26/SKILL.md)
+   - Check for direct skills: skills/<name>/SKILL.md (e.g., skills/setup/SKILL.md)
+   - Follow symlinks: skills/<name>/latest -> <version>/
+   - Extract version metadata from SKILL.md frontmatter (version, stability, features)
+   - Build list of available skills with version info for template rendering
    - Support any skill type: languages, frameworks, auth, infrastructure, databases
    ```
 
@@ -89,34 +91,36 @@ When this skill is invoked:
 
 3. **For each detected IDE:**
    - Copy the base template from `skills/project-rules/templates/`
-   - Replace {SKILL_LIST} placeholder with detected skills
+   - Replace {SKILL_LIST} placeholder with detected skills and versions
    - Write base configuration to target location
-   - For Cursor: Create individual .mdc files for each detected skill
-   - For Claude Code: Create individual .claude/rules/agentic-<skill>.md files
+   - For Cursor: Create individual .mdc files for each detected skill with version
+   - For Claude Code: Create individual `.claude/rules/agentic-<skill>-<version>.md` files
    - If files exist, append/merge rather than overwrite
+   - Include version info in rule file names to avoid conflicts
 
 4. **Target file paths:**
-   - Claude Code: `CLAUDE.md` (project root) + `.claude/rules/agentic-<skill>.md` per skill
-   - Cursor: `.cursor/rules/agentic-universal.mdc` + `.cursor/rules/agentic-<skill>.mdc` per skill
-   - Windsurf: `.windsurf/rules/skills.md` (single file with all rules)
-   - GitHub Copilot: `.github/copilot-instructions.md` (single file with all rules)
-   - Codex: `AGENTS.md` (project root, append)
+   - Claude Code: `CLAUDE.md` (project root) + `.claude/rules/agentic-<skill>-<version>.md` per versioned skill
+   - Cursor: `.cursor/rules/agentic-universal.mdc` + `.cursor/rules/agentic-<skill>-<version>.mdc` per versioned skill
+   - Windsurf: `.windsurf/rules/skills.md` (single file with all rules and versions)
+   - GitHub Copilot: `.github/copilot-instructions.md` (single file with all rules and versions)
+   - Codex: `AGENTS.md` (project root, append with version info)
 
 5. **Create missing directories** if needed (e.g., `.cursor/rules/`, `.claude/rules/`)
 
 6. **Print summary** of actions taken:
    ```
-   ✓ Detected skills: go (1.23.x), react (18.2), auth (saml), docker (24)
+   ✓ Detected skills: go (1.26 - latest), python (3.12 - latest), react (18.2 - stable)
    ✓ Detected Claude Code (.claude/ directory)
    ✓ Generated CLAUDE.md with skill routing rules
-   ✓ Created .claude/rules/agentic-go.md, agentic-react.md, agentic-auth.md, agentic-docker.md
+   ✓ Created .claude/rules/agentic-go-1.26.md, agentic-python-3.12.md, agentic-react-18.2.md
    ✓ Detected Cursor (.cursor/ directory)
    ✓ Created .cursor/rules/agentic-universal.mdc
-   ✓ Created .cursor/rules/agentic-go.mdc, agentic-react.mdc, agentic-auth.mdc, agentic-docker.mdc
+   ✓ Created .cursor/rules/agentic-go-1.26.mdc, agentic-python-3.12.mdc, agentic-react-18.2.mdc
    
    Next steps:
-   - Commit the generated files to version control
-   - Any skill type can be installed from versioned branches
+   - Commit the generated files to version control  
+   - Skills auto-load based on file patterns and versions
+   - Multiple skill versions can coexist without conflicts
    - Re-run setup after installing new skills to update configuration
    - Mix and match skills from any branches - they all integrate seamlessly
    ```

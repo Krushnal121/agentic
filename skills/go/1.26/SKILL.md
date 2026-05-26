@@ -1,12 +1,22 @@
 ---
 name: go
+version: 1.26
 description: >
-  Use when writing, debugging, or refactoring Go (.go) files, or when working with
-  go.mod, go.sum, running go test/build/vet/golangci-lint, or diagnosing Go compiler errors.
-  Targets Go 1.26.x with modern idioms, security practices, and performance patterns.
-  Also use when reviewing Go code, setting up Go projects, or optimizing Go applications.
-  Do NOT use for Go template files (.tmpl) unrelated to Go source code, or when Go 
-  is only incidentally mentioned in a non-Go task.
+  Enterprise Go 1.26.x development patterns with comprehensive guidance for senior developers.
+  Includes modern idioms, security practices, performance optimization, and production-ready patterns.
+  Features 15 specialized modules covering testing, concurrency, architecture, and toolchain configuration.
+stability: latest
+recommended: true
+features:
+  - "Modern tooling integration (mockery, testcontainers, golangci-lint)"
+  - "Enterprise architecture patterns and project layout"
+  - "Comprehensive security practices (crypto, input validation)"
+  - "Performance optimization and profiling strategies"
+  - "Advanced concurrency patterns and synchronization"
+  - "Linter-compliant documentation standards"
+  - "15 comprehensive modules (10,738+ lines total)"
+target_audience: "Senior developers building production Go applications"
+compatibility: "Go 1.21+ with 1.26-specific optimizations"
 ---
 
 # Go 1.26 Development

@@ -128,42 +128,39 @@ When `setup` skill runs:
 6. **Create directories**: Make parent directories if needed
 7. **Handle conflicts**: Merge with existing files rather than overwrite
 
-### Branch-Compatible Architecture
+### Versioned Skill Architecture
 
-This design supports mixed skill installation across **any skill type**:
+This design supports mixed skill installation with version selection:
 
 ```bash
-# Languages from specific versions
-npx skills add https://github.com/Krushnal121/agentic/tree/go/1.23/skills/go
-npx skills add https://github.com/Krushnal121/agentic/tree/python/3.12/skills/python
+# Primary installation with version picker
+npx skills add Krushnal121/agentic
+# Shows: ☑ go (1.26 - latest, enterprise patterns) ☑ python (3.12 - latest) etc.
 
-# Frameworks from versioned branches
-npx skills add https://github.com/Krushnal121/agentic/tree/react/18.2/skills/react
+# Direct version installation (for specific requirements)
+npx skills add https://github.com/Krushnal121/agentic/skills/go/1.25
 
-# Auth-specific implementations  
-npx skills add https://github.com/Krushnal121/agentic/tree/auth/saml/skills/auth
+# Mix different versions as needed
+# Install Go 1.26, Python 3.11, React 17 - all work together
 
-# Infrastructure tools
-npx skills add https://github.com/Krushnal121/agentic/tree/docker/24/skills/docker
-
-# Re-run setup to detect new skills
+# Re-run setup to detect new skills and versions
 ```
 
-**Result**: All skills work independently without conflicts:
-- **Cursor gets**: `agentic-go.mdc`, `agentic-python.mdc`, `agentic-react.mdc`, `agentic-auth.mdc`, `agentic-docker.mdc`
-- **Claude Code gets**: Individual `.claude/rules/agentic-{skill}.md` files for each
+**Result**: All skills and versions work independently without conflicts:
+- **Cursor gets**: `agentic-go-1.26.mdc`, `agentic-python-3.12.mdc`, `agentic-react-18.mdc`
+- **Claude Code gets**: Individual `.claude/rules/agentic-{skill}-{version}.md` files for each
 - **Universal rules**: Stay consistent across all skill types and versions
-- **Trigger patterns**: Each skill defines its own file patterns and trigger conditions
+- **Trigger patterns**: Each skill version defines its own file patterns and trigger conditions
 
 ### Skill Type Examples
 
 The system supports any skill type with appropriate trigger patterns:
 
-| Skill Type | Branch Example | Trigger Patterns | Use Case |
+| Skill Type | Version Example | Trigger Patterns | Use Case |
 |------------|----------------|------------------|----------|
-| **Language** | `go/1.23` | `*.go`, `go.mod`, `go.sum` | Version-specific language features |
-| **Framework** | `react/18.2` | `*.jsx`, `*.tsx`, `components/**` | Framework-specific patterns |
-| **Auth** | `auth/saml` | `**/auth/**`, `**/*saml*`, login flows | Authentication implementation |
+| **Language** | `go/1.26` | `*.go`, `go.mod`, `go.sum` | Version-specific language features |
+| **Framework** | `react/18` | `*.jsx`, `*.tsx`, `components/**` | Framework-specific patterns |
+| **Auth** | `auth/oauth2` | `**/auth/**`, `**/*oauth*`, login flows | Authentication implementation |
 | **Infrastructure** | `docker/24` | `Dockerfile`, `docker-compose*` | Container orchestration |
 | **Database** | `postgres/15` | `*.sql`, migrations, schema files | Database-specific patterns |
 
