@@ -68,19 +68,28 @@ The setup creates rules that automatically load the right skills based on contex
 
 ### Implementation Steps
 
-When this skill is invoked:
+When this skill is invoked, it follows an enhanced workflow that addresses robustness and safety:
 
-1. **Scan for installed skills:**
+1. **Setup skills directory access (Enhanced):**
+   ```
+   - Detect skills source directory (.agents/skills, skills/, or custom path)
+   - Create safe symlink if needed (with conflict detection and validation)
+   - Verify symlink integrity and permissions
+   - Support idempotent reruns without breaking existing setups
+   ```
+
+2. **Scan for installed skills with improved version detection:**
    ```
    - Check for versioned skills: skills/<name>/<version>/SKILL.md (e.g., skills/go/1.26/SKILL.md)
    - Check for direct skills: skills/<name>/SKILL.md (e.g., skills/setup/SKILL.md)
-   - Follow symlinks: skills/<name>/latest -> <version>/
+   - Follow symlinks intelligently: skills/<name>/latest -> <version>/
+   - Detect whether "latest" is alias or separate version
    - Extract version metadata from SKILL.md frontmatter (version, stability, features)
-   - Build list of available skills with version info for template rendering
+   - Generate rules only for actual versions, not aliases
    - Support any skill type: languages, frameworks, auth, infrastructure, databases
    ```
 
-2. **Check project root for IDE indicators:**
+3. **Check project root for IDE indicators:**
    ```
    - Look for .claude/ directory or CLAUDE.md file
    - Look for .cursor/ directory
@@ -89,40 +98,53 @@ When this skill is invoked:
    - Look for existing AGENTS.md file
    ```
 
-3. **For each detected IDE:**
+4. **For each detected IDE (with merge safety):**
    - Copy the base template from `skills/project-rules/templates/`
-   - Replace {SKILL_LIST} placeholder with detected skills and versions
-   - Write base configuration to target location
-   - For Cursor: Create individual .mdc files for each detected skill with version
-   - For Claude Code: Create individual `.claude/rules/agentic-<skill>-<version>.md` files
-   - If files exist, append/merge rather than overwrite
-   - Include version info in rule file names to avoid conflicts
+   - Create skills index file (e.g., `.cursor/rules/skills.mdc`)
+   - Generate universal rules file
+   - Create individual skill rule files with version
+   - **Enhanced safety:** Check for existing content before writing
+   - **Enhanced safety:** Append/merge rather than overwrite existing files
+   - **Enhanced safety:** Create backup files before modifications
+   - **Enhanced safety:** Validate rule uniqueness to prevent duplicates
 
-4. **Target file paths:**
+5. **Target file paths with index files:**
+   - Cursor: 
+     - `.cursor/rules/skills.mdc` (master index - NEW)
+     - `.cursor/rules/agentic-universal.mdc` (always active rules)
+     - `.cursor/rules/agentic-<skill>-<version>.mdc` per versioned skill
    - Claude Code: `CLAUDE.md` (project root) + `.claude/rules/agentic-<skill>-<version>.md` per versioned skill
-   - Cursor: `.cursor/rules/agentic-universal.mdc` + `.cursor/rules/agentic-<skill>-<version>.mdc` per versioned skill
    - Windsurf: `.windsurf/rules/skills.md` (single file with all rules and versions)
    - GitHub Copilot: `.github/copilot-instructions.md` (single file with all rules and versions)
    - Codex: `AGENTS.md` (project root, append with version info)
 
-5. **Create missing directories** if needed (e.g., `.cursor/rules/`, `.claude/rules/`)
-
-6. **Print summary** of actions taken:
+6. **Enhanced validation and safety:**
    ```
-   ✓ Detected skills: go (1.26 - latest), python (3.12 - latest), react (18.2 - stable)
-   ✓ Detected Claude Code (.claude/ directory)
-   ✓ Generated CLAUDE.md with skill routing rules
-   ✓ Created .claude/rules/agentic-go-1.26.md, agentic-python-3.12.md, agentic-react-18.2.md
+   - Validate symlink integrity
+   - Check file permissions and accessibility
+   - Verify rule file syntax
+   - Test for duplicate content
+   - Validate skill file existence
+   - Create backups before modifications
+   ```
+
+7. **Print comprehensive summary:**
+   ```
+   ✓ Skills directory access configured: skills -> .agents/skills
+   ✓ Detected skills: go (latest -> 1.26), python (3.12), react (18.2)
+   ✓ Version resolution: latest alias resolved to actual versions
    ✓ Detected Cursor (.cursor/ directory)
-   ✓ Created .cursor/rules/agentic-universal.mdc
-   ✓ Created .cursor/rules/agentic-go-1.26.mdc, agentic-python-3.12.mdc, agentic-react-18.2.mdc
+   ✓ Created .cursor/rules/skills.mdc (master index)
+   ✓ Created .cursor/rules/agentic-universal.mdc (universal rules)
+   ✓ Created .cursor/rules/agentic-go-1.26.mdc (version-specific rules)
+   ✓ Validation: All symlinks and rule files verified
    
    Next steps:
    - Commit the generated files to version control  
    - Skills auto-load based on file patterns and versions
    - Multiple skill versions can coexist without conflicts
-   - Re-run setup after installing new skills to update configuration
-   - Mix and match skills from any branches - they all integrate seamlessly
+   - Re-run setup safely after installing new skills
+   - Enhanced merge behavior prevents duplicate rules
    ```
 
 ### Template Rendering
@@ -134,12 +156,47 @@ Templates in `skills/project-rules/templates/` contain the IDE-specific syntax f
 
 The setup skill copies these templates exactly - no variable substitution is needed as templates contain the final rule syntax.
 
+## Enhanced Tools and Scripts
+
+The setup skill includes several utility scripts for improved robustness:
+
+### Version Detection (`detect-versions.sh`)
+- Intelligently detects installed skills and their versions
+- Properly handles symlinks and aliases (e.g., `latest -> 1.26`)
+- Differentiates between real versions and aliases
+- Prevents duplicate rule generation for aliased versions
+- Outputs structured data for processing
+
+### Symlink Management (`manage-symlinks.sh`) 
+- Safe symlink creation with conflict detection
+- Idempotent behavior - safe to run multiple times
+- Validates existing symlinks and their targets
+- Provides clear warnings for manual intervention needed
+- Supports force updates when needed
+
+### Rule Merging (`merge-rules.sh`)
+- Safe append/merge behavior for existing files
+- Duplicate detection prevents rule conflicts  
+- Creates backup files before modifications
+- Supports multiple IDE rule formats
+- Maintains rule integrity across reruns
+
+### Enhanced Setup (`enhanced-setup.sh`)
+- Main orchestration script incorporating all improvements
+- Comprehensive validation and error handling
+- Clear progress reporting and summary
+- Command-line options for customization
+- Addresses all identified workflow gaps
+
 ## Constraints
 
-- Never overwrite existing IDE rule files completely - always append
+- Never overwrite existing IDE rule files completely - always append/merge
 - Only generate rules for IDEs that are actually detected in the project
 - Always create necessary directories before writing files
-- Print clear summary of actions taken
+- Create backup files before modifying existing configurations
+- Print clear summary of actions taken with validation results
 - If no IDEs are detected, inform the user and suggest manual setup options
 - Never modify the skill files themselves, only generate IDE rule files
 - Ensure generated rules use conditional loading (not always-on) for language skills
+- Validate symlink integrity and provide clear error messages for conflicts
+- Support safe reruns without breaking existing configurations
