@@ -27,8 +27,8 @@ npx skills add Krushnal121/agentic
 ```
 
 Your agent instantly gains:
-- **Language expertise** — Go patterns, Python best practices, TypeScript types
-- **Architecture knowledge** — Your project structure, naming conventions, patterns
+- **Language expertise** — Go 1.26 enterprise patterns, Python best practices, TypeScript types
+- **Version control** — Choose exact skill versions for your project needs
 - **Smart loading** — Only relevant skills activate, keeping context lean
 - **Team consistency** — Everyone gets the same expert guidance
 
@@ -37,7 +37,7 @@ Your agent instantly gains:
 ### Auto-Detection Magic
 ```bash
 # Your agent sees: main.go
-# Instantly loads: Go 1.24 best practices, testing patterns, build tools
+# Instantly loads: Go 1.26 enterprise patterns, testing strategies, security practices
 ```
 
 ### IDE-Native Integration
@@ -170,12 +170,12 @@ We need skills for every technology:
 
 ### 📝 Quick Start
 ```bash
-# Create a versioned skill branch
-git checkout -b react/18.2
-git checkout -b auth/oauth2  
-git checkout -b docker/24
+# Fork and create your skill
+mkdir -p skills/python/3.12
+mkdir -p skills/react/18
+mkdir -p skills/docker/24
 
-# Follow our skill template
+# Follow our versioned skill template
 # See CONTRIBUTING.md for detailed guide
 ```
 
