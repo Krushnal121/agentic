@@ -1,0 +1,139 @@
+# Cursor Agentic Skills - Base Configuration
+
+This is the base template for Cursor IDE skill routing. The setup skill uses this to create the core infrastructure, then adds language-specific rules based on installed skills.
+
+## Base Universal Rules
+
+Creates `.cursor/rules/agentic-universal.mdc`:
+```yaml
+---
+description: Universal agentic skill routing — always active
+alwaysApply: true
+---
+Before writing any code or creating any file, read the SKILL.md for the relevant skill if available.
+Never skip skill loading even for simple tasks.
+
+File uploads not yet in context → load skills/file-reading/SKILL.md if available.
+```
+
+## Language-Specific Rule Templates
+
+The setup skill scans for installed skills and creates individual `.mdc` files only for detected skills:
+
+### If skills/go/SKILL.md exists → Create `.cursor/rules/agentic-go.mdc`:
+```yaml
+---
+description: Go skill routing
+globs: ["**/*.go", "**/go.mod", "**/go.sum"]
+alwaysApply: false
+---
+Read skills/go/SKILL.md before writing or editing Go code.
+```
+
+### If skills/python/SKILL.md exists → Create `.cursor/rules/agentic-python.mdc`:
+```yaml
+---
+description: Python skill routing  
+globs: ["**/*.py"]
+alwaysApply: false
+---
+Read skills/python/SKILL.md before writing or editing Python code.
+```
+
+### If skills/typescript/SKILL.md exists → Create `.cursor/rules/agentic-typescript.mdc`:
+```yaml
+---
+description: TypeScript skill routing
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: false
+---
+Read skills/typescript/SKILL.md before writing or editing TypeScript code.
+```
+
+### If skills/rust/SKILL.md exists → Create `.cursor/rules/agentic-rust.mdc`:
+```yaml
+---
+description: Rust skill routing
+globs: ["**/*.rs"]  
+alwaysApply: false
+---
+Read skills/rust/SKILL.md before writing or editing Rust code.
+```
+
+## Framework & Technology-Specific Skills
+
+The setup skill also detects and configures non-language skills:
+
+### If skills/react/SKILL.md exists → Create `.cursor/rules/agentic-react.mdc`:
+```yaml
+---
+description: React skill routing
+globs: ["**/*.jsx", "**/*.tsx", "**/package.json", "**/components/**/*"]
+alwaysApply: false
+---
+Read skills/react/SKILL.md when working with React components and patterns.
+```
+
+### If skills/auth/SKILL.md exists → Create `.cursor/rules/agentic-auth.mdc`:
+```yaml
+---
+description: Authentication skill routing
+globs: ["**/auth/**/*", "**/login/**/*", "**/oauth/**/*", "**/*auth*", "**/*saml*"]
+alwaysApply: false
+---
+Read skills/auth/SKILL.md when working with authentication and authorization code.
+```
+
+### If skills/docker/SKILL.md exists → Create `.cursor/rules/agentic-docker.mdc`:
+```yaml
+---
+description: Docker skill routing
+globs: ["**/Dockerfile", "**/docker-compose*.yml", "**/.dockerignore", "**/k8s/**/*"]
+alwaysApply: false
+---
+Read skills/docker/SKILL.md when working with containerization and deployment.
+```
+
+## Document Processing (Optional)
+
+If document skills are installed → Create `.cursor/rules/agentic-documents.mdc`:
+```yaml
+---
+description: Document file skill routing
+globs: ["**/*.docx", "**/*.pdf", "**/*.pptx", "**/*.xlsx"]
+alwaysApply: false
+---
+File type skill loading (only for installed skills):
+- .docx files → load skills/docx/SKILL.md (if exists)
+- .pdf files → load skills/pdf/SKILL.md (if exists)
+- .pptx files → load skills/pptx/SKILL.md (if exists)
+- .xlsx files → load skills/xlsx/SKILL.md (if exists)
+```
+
+## How Setup Works with Branch-Based Installation
+
+1. **Scan for skills**: Check what skills/ directories exist (any type: languages, frameworks, auth, etc.)
+2. **Create base rules**: Always create universal rules
+3. **Add skill-specific rules**: Only for detected skills (supports mix of branches and skill types)
+4. **Additive approach**: Mix and match any skills from any branches
+5. **No conflicts**: Each skill gets its own .mdc file with unique naming (agentic-{skill}.mdc)
+
+**Examples of supported skill combinations:**
+```bash
+# Language skills from specific versions
+npx skills add https://github.com/Krushnal121/agentic/tree/go/1.23/skills/go
+
+# Framework skills from versioned branches  
+npx skills add https://github.com/Krushnal121/agentic/tree/react/18.2/skills/react
+
+# Auth-specific skills
+npx skills add https://github.com/Krushnal121/agentic/tree/auth/saml/skills/auth
+
+# Mix and match - all work together!
+```
+
+**Result:** Each gets its own configuration:
+- `.cursor/rules/agentic-go.mdc` (Go 1.23 patterns)
+- `.cursor/rules/agentic-react.mdc` (React 18.2 patterns) 
+- `.cursor/rules/agentic-auth.mdc` (SAML auth patterns)
+- Universal rules stay consistent across all installations
