@@ -1,0 +1,21 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Language Skills",
+      "description": "Production-ready language expertise with versioned patterns and best practices.",
+      "skills": [
+        "go"
+      ]
+    },
+    {
+      "title": "Infrastructure",
+      "description": "Core system components that enable intelligent skill management and IDE integration.",
+      "skills": [
+        "setup",
+        "project-rules"
+      ]
+    }
+  ]
+}
