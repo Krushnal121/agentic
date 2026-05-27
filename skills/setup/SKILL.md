@@ -32,7 +32,7 @@ The skill detects and configures these IDEs:
 | IDE | Detection | Generated File |
 |---|---|---|
 | Claude Code | `.claude/` directory or existing `CLAUDE.md` | `CLAUDE.md` at project root |
-| Cursor | `.cursor/` directory | `.cursor/rules/skills.mdc` |
+| Cursor | `.cursor/` directory, Cursor runtime env, or `--cursor` flag | `.cursor/rules/skills.mdc` |
 | Windsurf | `.windsurf/` directory | `.windsurf/rules/skills.md` |
 | GitHub Copilot | `.github/` directory | `.github/copilot-instructions.md` |
 | Codex | `AGENTS.md` exists | `AGENTS.md` (append to existing) |
@@ -92,7 +92,7 @@ When this skill is invoked, it follows an enhanced workflow that addresses robus
 3. **Check project root for IDE indicators:**
    ```
    - Look for .claude/ directory or CLAUDE.md file
-   - Look for .cursor/ directory
+   - Look for .cursor/ directory (or Cursor runtime / `--cursor` flag to create it)
    - Look for .windsurf/ directory  
    - Look for .github/ directory
    - Look for existing AGENTS.md file
@@ -180,6 +180,7 @@ The setup skill includes several utility scripts for improved robustness:
 - Creates backup files before modifications
 - Supports multiple IDE rule formats
 - Maintains rule integrity across reruns
+- `process_detected_skill_versions` — creates IDE rules from both `VERSION` (real version dirs) and `ALIAS` (symlinks like `latest -> 1.26`)
 
 ### Enhanced Setup (`enhanced-setup.sh`)
 - Main orchestration script incorporating all improvements

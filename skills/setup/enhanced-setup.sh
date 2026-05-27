@@ -145,10 +145,17 @@ detect_ide_configurations() {
     
     declare -a detected_ides=()
     
-    # Check for Cursor
+    # Check for Cursor (.cursor/ directory or Cursor runtime environment)
     if [[ -d ".cursor" ]]; then
         detected_ides+=("cursor")
         log_info "Detected Cursor IDE (.cursor/ directory)"
+    elif [[ "${SETUP_CURSOR:-}" == "true" ]] \
+        || [[ -n "${CURSOR_TRACE_ID:-}" ]] \
+        || [[ -n "${CURSOR_AGENT:-}" ]] \
+        || [[ "${TERM_PROGRAM:-}" == "cursor" ]]; then
+        mkdir -p ".cursor/rules"
+        detected_ides+=("cursor")
+        log_info "Detected Cursor IDE (runtime) — created .cursor/rules/"
     fi
     
     # Check for Claude Code
@@ -275,25 +282,19 @@ File uploads not yet in context → load skills/file-reading/SKILL.md if availab
 
     safe_append_to_file ".cursor/rules/agentic-universal.mdc" "$universal_content" "mdc" "$BACKUP_EXISTING"
     
-    # Process detected skills and create individual rules
+    # Process detected skills and create individual rules (VERSION dirs and ALIAS symlinks)
     local skills_processed=0
-    
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^SKILL, ]]; then
-            current_skill=$(echo "$line" | cut -d',' -f2)
-            
-        elif [[ "$line" =~ ^ALIAS, ]]; then
-            alias_name=$(echo "$line" | cut -d',' -f2)
-            target_version=$(echo "$line" | cut -d',' -f3)
-            
-            # Create rule for the actual version (not the alias)
-            if [[ -f "$SKILLS_LINK_DIR/$current_skill/$target_version/SKILL.md" ]]; then
-                update_cursor_rule "$current_skill" "$target_version" "$SKILLS_LINK_DIR"
-                ((skills_processed++))
-                log_info "Created Cursor rule for $current_skill $target_version (via $alias_name alias)"
-            fi
+
+    _cursor_create_skill_rule() {
+        local skill="$1"
+        local version="$2"
+        local skills_path="$3"
+        if update_cursor_rule "$skill" "$version" "$skills_path"; then
+            log_info "Created Cursor rule for $skill $version"
         fi
-    done <<< "$DETECTED_SKILLS_OUTPUT"
+    }
+
+    process_detected_skill_versions "$DETECTED_SKILLS_OUTPUT" "$SKILLS_LINK_DIR" _cursor_create_skill_rule skills_processed
     
     if [[ $skills_processed -eq 0 ]]; then
         log_warn "No skill-specific rules created"
@@ -396,6 +397,9 @@ print_summary() {
             current_skill=$(echo "$line" | cut -d',' -f2)
             echo "  - $current_skill"
             
+        elif [[ "$line" =~ ^VERSION, ]]; then
+            version=$(echo "$line" | cut -d',' -f2)
+            echo "    version $version"
         elif [[ "$line" =~ ^ALIAS, ]]; then
             alias_name=$(echo "$line" | cut -d',' -f2)
             target_version=$(echo "$line" | cut -d',' -f3)
@@ -468,6 +472,10 @@ main() {
                 SKILLS_SOURCE_DIR="$2"
                 shift 2
                 ;;
+            --cursor)
+                SETUP_CURSOR="true"
+                shift
+                ;;
             --help|-h)
                 echo "Usage: $0 [OPTIONS]"
                 echo ""
@@ -475,6 +483,7 @@ main() {
                 echo "  --force           Force update existing symlinks and rules"
                 echo "  --no-backup       Don't create backup files"
                 echo "  --skills-dir DIR  Specify skills source directory"
+                echo "  --cursor          Configure Cursor even without .cursor/ directory"
                 echo "  --help            Show this help"
                 exit 0
                 ;;

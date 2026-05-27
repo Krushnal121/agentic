@@ -145,26 +145,17 @@ Load these skills automatically based on file context (only if installed):
 
 Load these skills when the specified language is the primary focus (only if installed):"
     
-    # Process detected skills and add their rules
-    local current_skill=""
+    # Process detected skills and add their rules (VERSION dirs and ALIAS symlinks)
     local skills_processed=0
-    
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^SKILL, ]]; then
-            current_skill=$(echo "$line" | cut -d',' -f2)
-            
-        elif [[ "$line" =~ ^ALIAS, ]]; then
-            local alias_name=$(echo "$line" | cut -d',' -f2)
-            local target_version=$(echo "$line" | cut -d',' -f3)
-            
-            # Add rule for the actual version (not the alias)
-            if [[ -f "$skills_path/$current_skill/$target_version/SKILL.md" ]]; then
-                local skill_rule=$(generate_copilot_skill_rules "$current_skill" "$target_version" "$skills_path")
-                copilot_content+="$skill_rule"
-                ((skills_processed++))
-            fi
-        fi
-    done <<< "$detected_skills_output"
+
+    _copilot_append_skill_rule() {
+        local skill="$1"
+        local version="$2"
+        local path="$3"
+        copilot_content+="$(generate_copilot_skill_rules "$skill" "$version" "$path")"
+    }
+
+    process_detected_skill_versions "$detected_skills_output" "$skills_path" _copilot_append_skill_rule skills_processed
     
     # Add implementation guidelines
     copilot_content+="

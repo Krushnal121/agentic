@@ -232,26 +232,19 @@ setup_claude_rules() {
     # Create or update main CLAUDE.md file
     create_claude_main_file "$skills_path" "$backup"
     
-    # Process detected skills and create individual rules
+    # Process detected skills and create individual rules (VERSION dirs and ALIAS symlinks)
     local skills_processed=0
-    local current_skill=""
-    
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^SKILL, ]]; then
-            current_skill=$(echo "$line" | cut -d',' -f2)
-            
-        elif [[ "$line" =~ ^ALIAS, ]]; then
-            local alias_name=$(echo "$line" | cut -d',' -f2)
-            local target_version=$(echo "$line" | cut -d',' -f3)
-            
-            # Create rule for the actual version (not the alias)
-            if [[ -f "$skills_path/$current_skill/$target_version/SKILL.md" ]]; then
-                create_claude_skill_rule "$current_skill" "$target_version" "$skills_path" "$backup"
-                ((skills_processed++))
-                log_info "Created Claude rule for $current_skill $target_version (via $alias_name alias)"
-            fi
+
+    _claude_create_skill_rule() {
+        local skill="$1"
+        local version="$2"
+        local path="$3"
+        if create_claude_skill_rule "$skill" "$version" "$path" "$backup"; then
+            log_info "Created Claude rule for $skill $version"
         fi
-    done <<< "$detected_skills_output"
+    }
+
+    process_detected_skill_versions "$detected_skills_output" "$skills_path" _claude_create_skill_rule skills_processed
     
     if [[ $skills_processed -eq 0 ]]; then
         log_warn "No Claude skill-specific rules created"

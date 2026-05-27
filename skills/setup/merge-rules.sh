@@ -149,6 +149,57 @@ merge_rule_files() {
     rm -f "$temp_file"
 }
 
+# Process VERSION and ALIAS lines from detect_all_skills output.
+# Invokes callback(skill_name, version, skills_path) for each unique pair with SKILL.md present.
+# Optional 4th arg: name of variable to receive invocation count.
+process_detected_skill_versions() {
+    local detection_output="$1"
+    local skills_path="${2:-skills}"
+    local callback="$3"
+    local current_skill=""
+    local count=0
+    declare -A processed=()
+
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+
+        if [[ "$line" =~ ^SKILL, ]]; then
+            current_skill=$(echo "$line" | cut -d',' -f2)
+            continue
+        fi
+
+        local version=""
+        if [[ "$line" =~ ^VERSION, ]]; then
+            version=$(echo "$line" | cut -d',' -f2)
+        elif [[ "$line" =~ ^ALIAS, ]]; then
+            version=$(echo "$line" | cut -d',' -f3)
+        else
+            continue
+        fi
+
+        [[ -z "$current_skill" || -z "$version" ]] && continue
+
+        local key="${current_skill}::${version}"
+        if [[ -n "${processed[$key]:-}" ]]; then
+            continue
+        fi
+
+        if [[ ! -f "$skills_path/$current_skill/$version/SKILL.md" ]]; then
+            continue
+        fi
+
+        processed[$key]=1
+        "$callback" "$current_skill" "$version" "$skills_path"
+        count=$((count + 1))
+    done <<< "$detection_output"
+
+    if [[ $# -ge 4 && -n "${4:-}" ]]; then
+        printf -v "$4" '%s' "$count"
+    fi
+
+    return 0
+}
+
 # Create or update Cursor rule file
 update_cursor_rule() {
     local skill_name="$1"
